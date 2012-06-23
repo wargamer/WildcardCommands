@@ -26,7 +26,7 @@ public class Wildcardplayer {
         if(wcPlayer == null)
             return;
         String prefixed = (ChatColor.DARK_GRAY + "[" 
-                            + ChatColor.RED + "Wildcard" + ChatColor.DARK_GRAY + "Command" + "]: "  
+                            + ChatColor.RED + "Wildcard" + ChatColor.DARK_GRAY + "Commands" + "]: "  
                             + ChatColor.WHITE + message);
         wcPlayer.sendMessage(prefixed);
     }
