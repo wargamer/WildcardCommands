@@ -18,7 +18,7 @@ public class CommandListener implements Listener {
     
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerCommand(ServerCommandEvent event) {
-        Wildcard wc = parseCommand(event.getCommand());
+        Wildcard wc = parseCommand(event.getCommand(), false);
         event.setCommand((wc != null) ? "" : event.getCommand());        
     }
     
@@ -29,14 +29,15 @@ public class CommandListener implements Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerCommand(PlayerCommandPreprocessEvent event) {        
-        if(event.getPlayer() == null || (!event.getPlayer().isOp() && !hasPerm(event.getPlayer(), "wc.use"))) {
+    public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
+        Wildcard wc = parseCommand(event.getMessage().substring(1), true);
+        if(wc != null && (event.getPlayer() == null || (!event.getPlayer().isOp() && !hasPerm(event.getPlayer(), "wc.use")))) {
             Wildcardplayer.sendMessage(event.getPlayer(), "You do not have permission to use WildcardCommands.");
             return;
         }
-        Wildcard wc = parseCommand(event.getMessage().substring(1));
         if(wc != null) {
             event.setCancelled(true);
+            parseCommand(event.getMessage().substring(1), false);
             Wildcardplayer.sendMessage(event.getPlayer(), ("Sent command to " + wc.getWildcardName()));            
         }
     }
@@ -49,7 +50,7 @@ public class CommandListener implements Listener {
         return null;
     }
     
-    private Wildcard parseCommand(String sCommand) {        
+    private Wildcard parseCommand(String sCommand, Boolean passive) {        
         Matcher m = Pattern.compile("\\[([a-zA-Z0-9]+\\:)*[^\\]]+\\]").matcher(sCommand);        
         String sWildcardFound = "";
         Wildcard sLastWildcard = null;
@@ -69,8 +70,9 @@ public class CommandListener implements Listener {
         if(players.isEmpty())
             return sLastWildcard;
 
-        for(Wildcardplayer player : players)            
-            Bukkit.getServer().dispatchCommand(console, sCommand.replace(sWildcardFound, player.getName()));            
+        if(!passive)
+            for(Wildcardplayer player : players)            
+                Bukkit.getServer().dispatchCommand(console, sCommand.replace(sWildcardFound, player.getName()));            
         
         return sLastWildcard;
     }
