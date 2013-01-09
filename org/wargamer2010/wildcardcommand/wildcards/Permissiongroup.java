@@ -11,21 +11,21 @@ public class Permissiongroup extends Wildcard {
     public String getWildcardName() {
         return "All Players from the Permission groups";
     }
-    
+
     @Override
-    public List<Wildcardplayer> getPlayers() {        
+    public List<Wildcardplayer> getPlayers() {
         List<Wildcardplayer> players = new ArrayList<Wildcardplayer>();
-        if(!Vault.vaultFound || Vault.permission == null)
-            return players;        
+        if(!Vault.isVaultFound() || Vault.getPermission() == null)
+            return players;
         for(Player player : Bukkit.getServer().getOnlinePlayers()) {
             try {
-                for(String group : Vault.permission.getPlayerGroups(player))
-                    if(wildcardparts.contains(group))
+                for(String group : Vault.getPermission().getPlayerGroups(player))
+                    if(getWildcardparts().contains(group))
                         players.add(new Wildcardplayer(player));
             } catch(UnsupportedOperationException UnsupportedEX) {
                 return players;
             }
-        }        
+        }
         return players;
     }
 }

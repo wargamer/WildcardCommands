@@ -15,19 +15,27 @@ import org.wargamer2010.wildcardcommand.wildcards.Wildcard;
 import org.wargamer2010.wildcardcommand.wildcards.Wildcardplayer;
 
 public class CommandListener implements Listener {
-    
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerCommand(ServerCommandEvent event) {
         Wildcard wc = parseCommand(event.getCommand(), false);
-        event.setCommand((wc != null) ? "" : event.getCommand());        
+        event.setCommand((wc != null) ? "" : event.getCommand());
     }
-    
+
+    /**
+     * Checks whether player has the given permission
+     * Defaults to false if Vault was not found or Vault has not hooked a permission plugin
+     *
+     * @param player Player to check for permission
+     * @param perm Permission to check for
+     * @return whether player has the perm
+     */
     public Boolean hasPerm(Player player, String perm) {
-        if(!Vault.vaultFound || Vault.permission == null)
+        if(!Vault.isVaultFound() || Vault.getPermission() == null)
             return false;
-        return Vault.permission.playerHas(player.getWorld(), player.getName(), perm);        
+        return Vault.getPermission().playerHas(player.getWorld(), player.getName(), perm);
     }
-    
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
         Wildcard wc = parseCommand(event.getMessage().substring(1), true);
@@ -38,20 +46,20 @@ public class CommandListener implements Listener {
         if(wc != null) {
             event.setCancelled(true);
             parseCommand(event.getMessage().substring(1), false);
-            Wildcardplayer.sendMessage(event.getPlayer(), ("Sent command to " + wc.getWildcardName()));            
+            Wildcardplayer.sendMessage(event.getPlayer(), ("Sent command to " + wc.getWildcardName()));
         }
     }
-    
+
     private Wildcard getWildcardFromCommand(String sCommand) {
         if(sCommand.length() < 3)
-            return null;        
+            return null;
         if(sCommand.contains("[") && sCommand.contains("]"))
             return Wildcard.getWildcardInstance(sCommand.substring(1, sCommand.length()-1));
         return null;
     }
-    
-    private Wildcard parseCommand(String sCommand, Boolean passive) {        
-        Matcher m = Pattern.compile("\\[([a-zA-Z0-9]+\\:)*[^\\]]+\\]").matcher(sCommand);        
+
+    private Wildcard parseCommand(String sCommand, Boolean passive) {
+        Matcher m = Pattern.compile("\\[([a-zA-Z0-9]+\\:)*[^\\]]+\\]").matcher(sCommand);
         String sWildcardFound = "";
         Wildcard sLastWildcard = null;
 
@@ -63,7 +71,7 @@ public class CommandListener implements Listener {
 
         if(sLastWildcard == null)
             return null;
-            
+
         CommandSender console = Bukkit.getServer().getConsoleSender();
 
         List<Wildcardplayer> players = sLastWildcard.getPlayers();
@@ -71,10 +79,10 @@ public class CommandListener implements Listener {
             return sLastWildcard;
 
         if(!passive)
-            for(Wildcardplayer player : players)            
-                Bukkit.getServer().dispatchCommand(console, sCommand.replace(sWildcardFound, player.getName()));            
-        
+            for(Wildcardplayer player : players)
+                Bukkit.getServer().dispatchCommand(console, sCommand.replace(sWildcardFound, player.getName()));
+
         return sLastWildcard;
     }
-    
+
 }

@@ -8,13 +8,17 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.Server;
 
 public class Vault {
-    public static Permission permission = null;
-    public static Economy economy = null;
-    public static Chat chat = null;
-    public static Boolean vaultFound = null;
+    private static Permission permission = null;
+    private static Economy economy = null;
+    private static Chat chat = null;
+    private static Boolean vaultFound = null;
     private static Server server = Bukkit.getServer();
-    
-    private static Boolean findVault() {
+
+    private Vault() {
+
+    }
+
+    private synchronized static Boolean findVault() {
         if(vaultFound != null)
             return vaultFound;
         if(server.getPluginManager().isPluginEnabled("Vault"))
@@ -23,7 +27,11 @@ public class Vault {
             vaultFound = false;
         return vaultFound;
     }
-    
+
+    /**
+     * Fetch permission handle from Vault if Vault is enabled
+     * @return whether it succeeded
+     */
     public static Boolean setupPermissions()
     {
         if(!findVault())
@@ -31,10 +39,14 @@ public class Vault {
         RegisteredServiceProvider<Permission> permissionProvider = server.getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
         if (permissionProvider != null) {
             permission = permissionProvider.getProvider();
-        }        
+        }
         return (permission != null);
     }
 
+    /**
+     * Fetch chat handle from Vault if Vault is enabled
+     * @return whether it succeeded
+     */
     public static Boolean setupChat()
     {
         if(!findVault())
@@ -47,6 +59,10 @@ public class Vault {
         return (chat != null);
     }
 
+    /**
+     * Fetch economy handle from Vault if Vault is enabled
+     * @return whether it succeeded
+     */
     public static Boolean setupEconomy()
     {
         if(!findVault())
@@ -57,5 +73,37 @@ public class Vault {
         }
 
         return (economy != null);
+    }
+
+    /**
+     *
+     * @return Permission handle
+     */
+    public static Permission getPermission() {
+        return permission;
+    }
+
+    /**
+     *
+     * @return Economy handle
+     */
+    public static Economy getEconomy() {
+        return economy;
+    }
+
+    /**
+     *
+     * @return Chat handle
+     */
+    public static Chat getChat() {
+        return chat;
+    }
+
+    /**
+     *
+     * @return Whether Vault is enabled
+     */
+    public static Boolean isVaultFound() {
+        return vaultFound;
     }
 }

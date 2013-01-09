@@ -8,12 +8,12 @@ public class Playernames extends Wildcard {
     public String getWildcardName() {
         return "the list of Players";
     }
-    
+
     @Override
     public List<Wildcardplayer> getPlayers() {
         List<Wildcardplayer> players = new ArrayList<Wildcardplayer>();
-        for(String playername : wildcardparts)
-            players.add(new Wildcardplayer(playername));        
+        for(String playername : getWildcardparts())
+            players.add(new Wildcardplayer(playername));
         return players;
     }
 }
